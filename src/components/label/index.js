@@ -65,7 +65,7 @@ export default class AnimatedLabel extends PureComponent {
   }
 
   render() {
-    let { children, restricted, fontSize, errorColor, baseColor, tintColor, ...props } = this.props;
+    let { children, restricted, fontSize, errorColor, baseColor, tintColor, style, ...props } = this.props;
     let { focus, input } = this.state;
 
     let color = restricted?
@@ -96,7 +96,7 @@ export default class AnimatedLabel extends PureComponent {
 
     return (
       <Animated.View style={containerStyle}>
-        <Animated.Text style={textStyle} {...props}>{children}</Animated.Text>
+        <Animated.Text style={[textStyle, style]} {...props}>{children}</Animated.Text>
       </Animated.View>
     );
   }

@@ -280,7 +280,7 @@ export default class TextField extends PureComponent {
         <Animated.View style={[ styles.container, containerStyle ]}>
           {disabled && <Line type='dotted' color={baseColor} />}
 
-          <Label {...{ fontSize, tintColor, baseColor, errorColor, animationDuration, focused, errored, restricted, active }}>
+          <Label {...{ fontSize, tintColor, baseColor, errorColor, animationDuration, focused, errored, restricted, active, style }}>
             {label}
           </Label>
 
