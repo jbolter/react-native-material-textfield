@@ -61,6 +61,7 @@ export default class TextField extends PureComponent {
     labelTextStyle: Text.propTypes.style,
     titleTextStyle: Text.propTypes.style,
     affixTextStyle: Text.propTypes.style,
+    errorTextStyle: Text.propTypes.style,
 
     tintColor: PropTypes.string,
     textColor: PropTypes.string,
@@ -323,6 +324,7 @@ export default class TextField extends PureComponent {
       inputContainerPadding,
       labelTextStyle,
       titleTextStyle,
+      errorTextStyle,
       tintColor,
       baseColor,
       textColor,
@@ -474,43 +476,43 @@ export default class TextField extends PureComponent {
 
     return (
       <View {...containerProps}>
-        <Animated.View {...inputContainerProps}>
-          {disabled && <Line type={disabledLineType} color={baseColor} />}
+          <Animated.View {...inputContainerProps}>
+              {disabled && <Line type={disabledLineType} color={baseColor} />}
 
-          <Label {...labelProps}>{label}</Label>
+              <Label {...labelProps}>{label}</Label>
 
-          <View style={styles.row}>
-            {this.renderAffix('prefix', active, focused)}
+              <View style={styles.row}>
+                  {this.renderAffix('prefix', active, focused)}
 
-            <TextInput
-              style={[styles.input, inputStyle, inputStyleOverrides]}
-              selectionColor={tintColor}
+                  <TextInput
+                      style={[styles.input, inputStyle, inputStyleOverrides]}
+                      selectionColor={tintColor}
 
-              {...props}
+                      {...props}
 
-              editable={!disabled && editable}
-              onChange={this.onChange}
-              onChangeText={this.onChangeText}
-              onContentSizeChange={this.onContentSizeChange}
-              onFocus={this.onFocus}
-              onBlur={this.onBlur}
-              value={value}
-              ref={this.updateRef}
-            />
+                      editable={!disabled && editable}
+                      onChange={this.onChange}
+                      onChangeText={this.onChangeText}
+                      onContentSizeChange={this.onContentSizeChange}
+                      onFocus={this.onFocus}
+                      onBlur={this.onBlur}
+                      value={value}
+                      ref={this.updateRef}
+                  />
 
-            {this.renderAffix('suffix', active, focused)}
-            {this.renderAccessory()}
-          </View>
-        </Animated.View>
+                  {this.renderAffix('suffix', active, focused)}
+                  {this.renderAccessory()}
+              </View>
+          </Animated.View>
 
-        <Animated.View style={helperContainerStyle}>
-          <View style={styles.flex}>
-            <Helper style={[errorStyle, titleTextStyle]}>{error}</Helper>
-            <Helper style={[titleStyle, titleTextStyle]}>{title}</Helper>
-          </View>
+          <Animated.View style={helperContainerStyle}>
+              <View style={styles.flex}>
+                  <Helper style={[errorStyle, titleTextStyle, errorTextStyle]}>{error}</Helper>
+                  <Helper style={[titleStyle, titleTextStyle]}>{title}</Helper>
+              </View>
 
-          <Counter {...counterProps} />
-        </Animated.View>
+              <Counter {...counterProps} />
+          </Animated.View>
       </View>
     );
   }
