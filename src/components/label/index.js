@@ -1,7 +1,8 @@
-import React, { PropTypes, PureComponent } from 'react';
-import { Animated, Easing } from 'react-native';
+import PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
+import { Animated } from 'react-native';
 
-export default class AnimatedLabel extends PureComponent {
+export default class Label extends PureComponent {
   static defaultProps = {
     numberOfLines: 1,
 
@@ -12,20 +13,28 @@ export default class AnimatedLabel extends PureComponent {
   };
 
   static propTypes = {
-    ...Animated.Text.propTypes,
-
     active: PropTypes.bool,
     focused: PropTypes.bool,
     errored: PropTypes.bool,
     restricted: PropTypes.bool,
 
+    baseSize: PropTypes.number.isRequired,
     fontSize: PropTypes.number.isRequired,
+    activeFontSize: PropTypes.number.isRequired,
+    basePadding: PropTypes.number.isRequired,
 
     tintColor: PropTypes.string.isRequired,
     baseColor: PropTypes.string.isRequired,
     errorColor: PropTypes.string.isRequired,
 
     animationDuration: PropTypes.number.isRequired,
+
+    style: Animated.Text.propTypes.style,
+
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.node),
+      PropTypes.node,
+    ]),
   };
 
   constructor(props) {
@@ -48,7 +57,6 @@ export default class AnimatedLabel extends PureComponent {
         .timing(input, {
           toValue: (props.active || props.focused)? 1 : 0,
           duration: animationDuration,
-          easing: Easing.inOut(Easing.ease),
         })
         .start();
     }
@@ -58,15 +66,26 @@ export default class AnimatedLabel extends PureComponent {
         .timing(focus, {
           toValue: props.errored? -1 : (props.focused? 1 : 0),
           duration: animationDuration,
-          easing: Easing.inOut(Easing.ease),
         })
         .start();
     }
   }
 
   render() {
-    let { children, restricted, fontSize, errorColor, baseColor, tintColor, style, ...props } = this.props;
     let { focus, input } = this.state;
+    let {
+      children,
+      restricted,
+      fontSize,
+      activeFontSize,
+      errorColor,
+      baseColor,
+      tintColor,
+      baseSize,
+      basePadding,
+      style,
+      ...props
+    } = this.props;
 
     let color = restricted?
       errorColor:
@@ -77,13 +96,16 @@ export default class AnimatedLabel extends PureComponent {
 
     let top = input.interpolate({
       inputRange: [0, 1],
-      outputRange: [32 + fontSize * 0.25, 16],
+      outputRange: [
+        baseSize + fontSize * 0.25,
+        baseSize - basePadding - activeFontSize,
+      ],
     });
 
     let textStyle = {
       fontSize: input.interpolate({
         inputRange: [0, 1],
-        outputRange: [fontSize, 12],
+        outputRange: [fontSize, activeFontSize],
       }),
 
       color,
@@ -96,7 +118,9 @@ export default class AnimatedLabel extends PureComponent {
 
     return (
       <Animated.View style={containerStyle}>
-        <Animated.Text style={[textStyle, style]} {...props}>{children}</Animated.Text>
+        <Animated.Text style={[style, textStyle]} {...props}>
+          {children}
+        </Animated.Text>
       </Animated.View>
     );
   }

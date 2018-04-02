@@ -7,7 +7,7 @@ export default StyleSheet.create({
   },
 
   text: {
-    fontSize: 12,
     textAlign: 'right',
+    backgroundColor: 'transparent',
   },
 });

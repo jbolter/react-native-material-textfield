@@ -2,18 +2,20 @@ import React, { Component } from 'react';
 import { AppRegistry, ScrollView, View } from 'react-native';
 import { RaisedTextButton } from 'react-native-material-buttons';
 import { TextField } from 'react-native-material-textfield';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 let styles = {
   scroll: {
-    paddingHorizontal: 4,
-    paddingVertical: 30,
     backgroundColor: '#E8EAF6',
   },
 
   container: {
-    marginHorizontal: 4,
-    marginVertical: 8,
-    paddingHorizontal: 8,
+    margin: 8,
+    marginTop: 24,
+  },
+
+  contentContainer: {
+    padding: 8,
   },
 };
 
@@ -30,11 +32,21 @@ export default function init() {
       this.onSubmitAbout = this.onSubmitAbout.bind(this);
       this.onSubmitEmail = this.onSubmitEmail.bind(this);
       this.onSubmitPassword = this.onSubmitPassword.bind(this);
+      this.onAccessoryPress = this.onAccessoryPress.bind(this);
+
+      this.firstnameRef = this.updateRef.bind(this, 'firstname');
+      this.lastnameRef = this.updateRef.bind(this, 'lastname');
+      this.aboutRef = this.updateRef.bind(this, 'about');
+      this.emailRef = this.updateRef.bind(this, 'email');
+      this.passwordRef = this.updateRef.bind(this, 'password');
+
+      this.renderPasswordAccessory = this.renderPasswordAccessory.bind(this);
 
       this.state = {
         firstname: 'Eddard',
         lastname: 'Stark',
         about: 'Stoic, dutiful, and honorable man, considered to embody the values of the North',
+        secureTextEntry: true,
       };
     }
 
@@ -42,7 +54,7 @@ export default function init() {
       let { errors = {} } = this.state;
 
       for (let name in errors) {
-        let ref = this.refs[name];
+        let ref = this[name];
 
         if (ref && ref.isFocused()) {
           delete errors[name];
@@ -53,48 +65,51 @@ export default function init() {
     }
 
     onChangeText(text) {
-      for (let key in this.refs) {
-        let ref = this.refs[key];
+      ['firstname', 'lastname', 'about', 'email', 'password']
+        .map((name) => ({ name, ref: this[name] }))
+        .forEach(({ name, ref }) => {
+          if (ref.isFocused()) {
+            this.setState({ [name]: text });
+          }
+        });
+    }
 
-        if (ref.isFocused()) {
-          this.setState({ [key]: text });
-          break;
-        }
-      }
+    onAccessoryPress() {
+      this.setState(({ secureTextEntry }) => ({ secureTextEntry: !secureTextEntry }));
     }
 
     onSubmitFirstName() {
-      this.refs.lastname.focus();
+      this.lastname.focus();
     }
 
     onSubmitLastName() {
-      this.refs.about.focus();
+      this.about.focus();
     }
 
     onSubmitAbout() {
-        this.refs.email.focus();
+      this.email.focus();
     }
 
     onSubmitEmail() {
-      this.refs.password.focus();
+      this.password.focus();
     }
 
     onSubmitPassword() {
-      this.refs.password.blur();
+      this.password.blur();
     }
 
     onSubmit() {
       let errors = {};
 
       ['firstname', 'lastname', 'email', 'password']
-        .forEach((field) => {
-          let value = this.refs[field].value();
+        .forEach((name) => {
+          let value = this[name].value();
 
           if (!value) {
-            errors[field] = 'Should not be empty';
+            errors[name] = 'Should not be empty';
           } else {
-            if (field === 'password' && value.length < 6) {
-              errors[field] = 'Too short';
+            if ('password' === name && value.length < 6) {
+              errors[name] = 'Too short';
             }
           }
         });
@@ -102,14 +117,41 @@ export default function init() {
       this.setState({ errors });
     }
 
-    render() {
-      let { errors = {}, ...data } = this.state;
+    updateRef(name, ref) {
+      this[name] = ref;
+    }
+
+    renderPasswordAccessory() {
+      let { secureTextEntry } = this.state;
+
+      let name = secureTextEntry?
+        'visibility':
+        'visibility-off';
 
       return (
-        <ScrollView style={styles.scroll}>
+        <MaterialIcon
+          size={24}
+          name={name}
+          color={TextField.defaultProps.baseColor}
+          onPress={this.onAccessoryPress}
+          suppressHighlighting
+        />
+      );
+    }
+
+    render() {
+      let { errors = {}, secureTextEntry, ...data } = this.state;
+      let { firstname = 'name', lastname = 'house' } = data;
+
+      let defaultEmail = `${firstname}@${lastname}.com`
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+
+      return (
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.contentContainer}>
           <View style={styles.container}>
             <TextField
-              ref='firstname'
+              ref={this.firstnameRef}
               value={data.firstname}
               autoCorrect={false}
               enablesReturnKeyAutomatically={true}
@@ -122,7 +164,7 @@ export default function init() {
             />
 
             <TextField
-              ref='lastname'
+              ref={this.lastnameRef}
               value={data.lastname}
               autoCorrect={false}
               enablesReturnKeyAutomatically={true}
@@ -135,20 +177,22 @@ export default function init() {
             />
 
             <TextField
-              ref='about'
+              ref={this.aboutRef}
               value={data.about}
               onFocus={this.onFocus}
               onChangeText={this.onChangeText}
               onSubmitEditing={this.onSubmitAbout}
               returnKeyType='next'
               multiline={true}
+              blurOnSubmit={true}
               label='About (optional)'
               characterRestriction={140}
             />
 
             <TextField
-              ref='email'
+              ref={this.emailRef}
               value={data.email}
+              defaultValue={defaultEmail}
               keyboardType='email-address'
               autoCapitalize='none'
               autoCorrect={false}
@@ -162,9 +206,9 @@ export default function init() {
             />
 
             <TextField
-              ref='password'
+              ref={this.passwordRef}
               value={data.password}
-              secureTextEntry={true}
+              secureTextEntry={secureTextEntry}
               autoCapitalize='none'
               autoCorrect={false}
               enablesReturnKeyAutomatically={true}
@@ -177,10 +221,10 @@ export default function init() {
               title='Choose wisely'
               maxLength={30}
               characterRestriction={20}
+              renderAccessory={this.renderPasswordAccessory}
             />
 
             <TextField
-              ref='house'
               value={data.lastname}
               label='House'
               title='Derived from last name'

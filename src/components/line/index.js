@@ -1,29 +1,29 @@
-import React, { PropTypes, PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
 import { View } from 'react-native';
 
 import styles from './styles';
 
 export default class Line extends PureComponent {
-  static defaultProps = {
-    pointerEvents: 'none',
-  };
-
   static propTypes = {
-    ...View.propTypes,
-
-    type: PropTypes.oneOf(['solid', 'dotted', 'dashed']).isRequired,
+    type: PropTypes.oneOf(['solid', 'dotted', 'dashed', 'none']).isRequired,
     color: PropTypes.string.isRequired,
   };
 
   render() {
-    let { color: borderColor, type: borderStyle, ...props } = this.props;
+    let { color: borderColor, type: borderStyle } = this.props;
+
+    if ('none' === borderStyle) {
+      return null;
+    }
 
     let lineStyle = {
-      borderColor, borderStyle,
+      borderColor,
+      borderStyle,
     };
 
     return (
-      <View style={[styles.line, lineStyle]} {...props} />
+      <View style={[styles.line, lineStyle]} pointerEvents='none' />
     );
   }
 }
