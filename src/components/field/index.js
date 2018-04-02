@@ -54,6 +54,7 @@ export default class TextField extends PureComponent {
     fontSize: PropTypes.number,
     titleFontSize: PropTypes.number,
     labelFontSize: PropTypes.number,
+    errorFontSize: PropTypes.number,
     labelHeight: PropTypes.number,
     labelPadding: PropTypes.number,
     inputContainerPadding: PropTypes.number,
@@ -61,7 +62,6 @@ export default class TextField extends PureComponent {
     labelTextStyle: Text.propTypes.style,
     titleTextStyle: Text.propTypes.style,
     affixTextStyle: Text.propTypes.style,
-    errorTextStyle: Text.propTypes.style,
 
     tintColor: PropTypes.string,
     textColor: PropTypes.string,
@@ -318,13 +318,13 @@ export default class TextField extends PureComponent {
       animationDuration,
       fontSize,
       titleFontSize,
+      errorFontSize,
       labelFontSize,
       labelHeight,
       labelPadding,
       inputContainerPadding,
       labelTextStyle,
       titleTextStyle,
-      errorTextStyle,
       tintColor,
       baseColor,
       textColor,
@@ -407,7 +407,7 @@ export default class TextField extends PureComponent {
         titleFontSize:
         focus.interpolate({
           inputRange:  [-1, 0, 1],
-          outputRange: [titleFontSize, 0, 0],
+          outputRange: [(errorFontSize) ? errorFontSize : titleFontSize, 0, 0],
         }),
     };
 
@@ -507,7 +507,7 @@ export default class TextField extends PureComponent {
 
           <Animated.View style={helperContainerStyle}>
               <View style={styles.flex}>
-                  <Helper style={[errorStyle, titleTextStyle, errorTextStyle]}>{error}</Helper>
+                  <Helper style={[errorStyle, titleTextStyle]}>{error}</Helper>
                   <Helper style={[titleStyle, titleTextStyle]}>{title}</Helper>
               </View>
 
